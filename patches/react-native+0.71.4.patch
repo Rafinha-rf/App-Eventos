@@ -1,0 +1,529 @@
+diff --git a/node_modules/react-native/Libraries/Components/Touchable/TouchableOpacity.js b/node_modules/react-native/Libraries/Components/Touchable/TouchableOpacity.js
+index 2aef4e8..cc18e8e 100644
+--- a/node_modules/react-native/Libraries/Components/Touchable/TouchableOpacity.js
++++ b/node_modules/react-native/Libraries/Components/Touchable/TouchableOpacity.js
+@@ -301,9 +301,8 @@ class TouchableOpacity extends React.Component<Props, State> {
+     this.state.pressability.configure(this._createPressabilityConfig());
+     if (
+       this.props.disabled !== prevProps.disabled ||
+-      (flattenStyle(prevProps.style)?.opacity !==
+-        flattenStyle(this.props.style)?.opacity) !==
+-        undefined
++      flattenStyle(prevProps.style)?.opacity !==
++        flattenStyle(this.props.style)?.opacity
+     ) {
+       this._opacityInactive(250);
+     }
+diff --git a/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.d.ts b/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.d.ts
+index a6f3316..aa5e14b 100644
+--- a/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.d.ts
++++ b/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.d.ts
+@@ -69,7 +69,7 @@ export interface TouchableWithoutFeedbackProps
+    * the Z-index of sibling views always takes precedence if a touch hits
+    * two overlapping views.
+    */
+-  hitSlop?: Insets | undefined;
++  hitSlop?: null | Insets | number | undefined;
+ 
+   /**
+    * Used to reference react managed views from native code.
+@@ -121,7 +121,7 @@ export interface TouchableWithoutFeedbackProps
+    * while the scroll view is disabled. Ensure you pass in a constant
+    * to reduce memory allocations.
+    */
+-  pressRetentionOffset?: Insets | undefined;
++  pressRetentionOffset?: null | Insets | number | undefined;
+ 
+   /**
+    * Used to locate this view in end-to-end tests.
+diff --git a/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.js b/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.js
+index 70b4337..364fc52 100644
+--- a/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.js
++++ b/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.js
+@@ -15,7 +15,7 @@ import type {
+   AccessibilityState,
+   AccessibilityValue,
+ } from '../../Components/View/ViewAccessibility';
+-import type {EdgeInsetsProp} from '../../StyleSheet/EdgeInsetsPropType';
++import type {EdgeInsetsOrSizeProp} from '../../StyleSheet/EdgeInsetsPropType';
+ import type {
+   BlurEvent,
+   FocusEvent,
+@@ -67,7 +67,7 @@ type Props = $ReadOnly<{|
+   delayPressOut?: ?number,
+   disabled?: ?boolean,
+   focusable?: ?boolean,
+-  hitSlop?: ?EdgeInsetsProp,
++  hitSlop?: ?EdgeInsetsOrSizeProp,
+   id?: string,
+   importantForAccessibility?: ?('auto' | 'yes' | 'no' | 'no-hide-descendants'),
+   nativeID?: ?string,
+@@ -79,7 +79,7 @@ type Props = $ReadOnly<{|
+   onPress?: ?(event: PressEvent) => mixed,
+   onPressIn?: ?(event: PressEvent) => mixed,
+   onPressOut?: ?(event: PressEvent) => mixed,
+-  pressRetentionOffset?: ?EdgeInsetsProp,
++  pressRetentionOffset?: ?EdgeInsetsOrSizeProp,
+   rejectResponderTermination?: ?boolean,
+   testID?: ?string,
+   touchSoundDisabled?: ?boolean,
+diff --git a/node_modules/react-native/Libraries/Core/ReactNativeVersion.js b/node_modules/react-native/Libraries/Core/ReactNativeVersion.js
+index fc7b02f..49eb90f 100644
+--- a/node_modules/react-native/Libraries/Core/ReactNativeVersion.js
++++ b/node_modules/react-native/Libraries/Core/ReactNativeVersion.js
+@@ -12,6 +12,6 @@
+ exports.version = {
+   major: 0,
+   minor: 71,
+-  patch: 3,
++  patch: 4,
+   prerelease: null,
+ };
+diff --git a/node_modules/react-native/Libraries/Lists/FlatList.d.ts b/node_modules/react-native/Libraries/Lists/FlatList.d.ts
+index 3d9cf32..4f60e18 100644
+--- a/node_modules/react-native/Libraries/Lists/FlatList.d.ts
++++ b/node_modules/react-native/Libraries/Lists/FlatList.d.ts
+@@ -14,9 +14,9 @@ import type {
+   VirtualizedListProps,
+ } from './VirtualizedList';
+ import type {ScrollViewComponent} from '../Components/ScrollView/ScrollView';
+-import {StyleProp} from '../StyleSheet/StyleSheet';
+-import {ViewStyle} from '../StyleSheet/StyleSheetTypes';
+-import {View} from '../Components/View/View';
++import type {StyleProp} from '../StyleSheet/StyleSheet';
++import type {ViewStyle} from '../StyleSheet/StyleSheetTypes';
++import type {View} from '../Components/View/View';
+ 
+ export interface FlatListProps<ItemT> extends VirtualizedListProps<ItemT> {
+   /**
+@@ -40,10 +40,10 @@ export interface FlatListProps<ItemT> extends VirtualizedListProps<ItemT> {
+     | undefined;
+ 
+   /**
+-   * For simplicity, data is just a plain array. If you want to use something else,
+-   * like an immutable list, use the underlying VirtualizedList directly.
++   * An array (or array-like list) of items to render. Other data types can be
++   * used by targetting VirtualizedList directly.
+    */
+-  data: ReadonlyArray<ItemT> | null | undefined;
++  data: ArrayLike<ItemT> | null | undefined;
+ 
+   /**
+    * A marker property for telling the list to re-render (since it implements PureComponent).
+diff --git a/node_modules/react-native/Libraries/Lists/FlatList.js b/node_modules/react-native/Libraries/Lists/FlatList.js
+index 56748ea..9b280f2 100644
+--- a/node_modules/react-native/Libraries/Lists/FlatList.js
++++ b/node_modules/react-native/Libraries/Lists/FlatList.js
+@@ -30,10 +30,10 @@ const React = require('react');
+ 
+ type RequiredProps<ItemT> = {|
+   /**
+-   * For simplicity, data is just a plain array. If you want to use something else, like an
+-   * immutable list, use the underlying `VirtualizedList` directly.
++   * An array (or array-like list) of items to render. Other data types can be
++   * used by targetting VirtualizedList directly.
+    */
+-  data: ?$ReadOnlyArray<ItemT>,
++  data: ?$ArrayLike<ItemT>,
+ |};
+ type OptionalProps<ItemT> = {|
+   /**
+@@ -163,6 +163,11 @@ function numColumnsOrDefault(numColumns: ?number) {
+   return numColumns ?? 1;
+ }
+ 
++function isArrayLike(data: mixed): boolean {
++  // $FlowExpectedError[incompatible-use]
++  return typeof Object(data).length === 'number';
++}
++
+ type FlatListProps<ItemT> = {|
+   ...RequiredProps<ItemT>,
+   ...OptionalProps<ItemT>,
+@@ -497,8 +502,10 @@ class FlatList<ItemT> extends React.PureComponent<Props<ItemT>, void> {
+     );
+   }
+ 
+-  // $FlowFixMe[missing-local-annot]
+-  _getItem = (data: Array<ItemT>, index: number) => {
++  _getItem = (
++    data: $ArrayLike<ItemT>,
++    index: number,
++  ): ?(ItemT | $ReadOnlyArray<ItemT>) => {
+     const numColumns = numColumnsOrDefault(this.props.numColumns);
+     if (numColumns > 1) {
+       const ret = [];
+@@ -515,8 +522,14 @@ class FlatList<ItemT> extends React.PureComponent<Props<ItemT>, void> {
+     }
+   };
+ 
+-  _getItemCount = (data: ?Array<ItemT>): number => {
+-    if (Array.isArray(data)) {
++  _getItemCount = (data: ?$ArrayLike<ItemT>): number => {
++    // Legacy behavior of FlatList was to forward "undefined" length if invalid
++    // data like a non-arraylike object is passed. VirtualizedList would then
++    // coerce this, and the math would work out to no-op. For compatibility, if
++    // invalid data is passed, we tell VirtualizedList there are zero items
++    // available to prevent it from trying to read from the invalid data
++    // (without propagating invalidly typed data).
++    if (data != null && isArrayLike(data)) {
+       const numColumns = numColumnsOrDefault(this.props.numColumns);
+       return numColumns > 1 ? Math.ceil(data.length / numColumns) : data.length;
+     } else {
+diff --git a/node_modules/react-native/React/Base/RCTVersion.m b/node_modules/react-native/React/Base/RCTVersion.m
+index 79b8537..561b6ee 100644
+--- a/node_modules/react-native/React/Base/RCTVersion.m
++++ b/node_modules/react-native/React/Base/RCTVersion.m
+@@ -23,7 +23,7 @@ NSDictionary* RCTGetReactNativeVersion(void)
+     __rnVersion = @{
+                   RCTVersionMajor: @(0),
+                   RCTVersionMinor: @(71),
+-                  RCTVersionPatch: @(3),
++                  RCTVersionPatch: @(4),
+                   RCTVersionPrerelease: [NSNull null],
+                   };
+   });
+diff --git a/node_modules/react-native/ReactAndroid/build.gradle b/node_modules/react-native/ReactAndroid/build.gradle
+index f93403c..155cb59 100644
+--- a/node_modules/react-native/ReactAndroid/build.gradle
++++ b/node_modules/react-native/ReactAndroid/build.gradle
+@@ -5,17 +5,12 @@
+  * LICENSE file in the root directory of this source tree.
+  */
+ 
+-buildscript {
+-    dependencies {
+-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${rootProject.hasProperty("kotlinVersion") ? rootProject.ext.kotlinVersion : KOTLIN_VERSION}"
+-    }
+-}
+-
+ plugins {
+     id("com.android.library")
+     id("com.facebook.react")
+     id("de.undercouch.download")
+     id("maven-publish")
++    id("org.jetbrains.kotlin.android")
+ }
+ 
+ import com.facebook.react.tasks.internal.*
+@@ -117,6 +112,10 @@ final def preparePrefab = tasks.register("preparePrefab", PreparePrefabHeadersTa
+                     new Pair("../ReactCommon/react/renderer/graphics/platform/cxx/", ""),
+                 ]
+             ),
++            new PrefabPreprocessingEntry(
++                "rrc_root",
++                new Pair("../ReactCommon/react/renderer/components/root/", "react/renderer/components/root/")
++            ),
+             new PrefabPreprocessingEntry(
+                 "rrc_view",
+                 new Pair("../ReactCommon/react/renderer/components/view/", "react/renderer/components/view/")
+@@ -471,6 +470,7 @@ android {
+                     "react_render_core",
+                     "react_render_graphics",
+                     "rrc_image",
++                    "rrc_root",
+                     "rrc_view",
+                     "jsi",
+                     "glog",
+@@ -567,6 +567,9 @@ android {
+         rrc_image {
+             headers(new File(prefabHeadersDir, "rrc_image").absolutePath)
+         }
++        rrc_root {
++            headers(new File(prefabHeadersDir, "rrc_root").absolutePath)
++        }
+         rrc_view {
+             headers(new File(prefabHeadersDir, "rrc_view").absolutePath)
+         }
+@@ -668,12 +671,7 @@ react {
+     // TODO: The library name is chosen for parity with Fabric components & iOS
+     // This should be changed to a more generic name, e.g. `ReactCoreSpec`.
+     libraryName = "rncore"
+-    root = file("..")
+     jsRootDir = file("../Libraries")
+-    reactNativeDir = file("$projectDir/..")
+-    // We search for the codegen in either one of the `node_modules` folder or in the
+-    // root packages folder (that's for when we build from source without calling `yarn install`).
+-    codegenDir = file(findNodeModulePath(projectDir, "react-native-codegen") ?: "../packages/react-native-codegen/")
+ }
+ 
+ apply plugin: "org.jetbrains.kotlin.android"
+diff --git a/node_modules/react-native/ReactAndroid/gradle.properties b/node_modules/react-native/ReactAndroid/gradle.properties
+index e104e13..d7a93d7 100644
+--- a/node_modules/react-native/ReactAndroid/gradle.properties
++++ b/node_modules/react-native/ReactAndroid/gradle.properties
+@@ -1,4 +1,4 @@
+-VERSION_NAME=0.71.3
++VERSION_NAME=0.71.4
+ GROUP=com.facebook.react
+ 
+ # JVM Versions
+@@ -30,8 +30,5 @@ FOLLY_VERSION=2021.07.22.00
+ GLOG_VERSION=0.3.5
+ LIBEVENT_VERSION=2.1.12
+ 
+-# Plugins Versions
+-KOTLIN_VERSION=1.6.10
+-
+ android.useAndroidX=true
+ android.enableJetifier=true
+diff --git a/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/systeminfo/ReactNativeVersion.java b/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/systeminfo/ReactNativeVersion.java
+index df7f50a..14a89ca 100644
+--- a/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/systeminfo/ReactNativeVersion.java
++++ b/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/systeminfo/ReactNativeVersion.java
+@@ -17,6 +17,6 @@ public class ReactNativeVersion {
+   public static final Map<String, Object> VERSION = MapBuilder.<String, Object>of(
+       "major", 0,
+       "minor", 71,
+-      "patch", 3,
++      "patch", 4,
+       "prerelease", null);
+ }
+diff --git a/node_modules/react-native/ReactCommon/cxxreact/ReactNativeVersion.h b/node_modules/react-native/ReactCommon/cxxreact/ReactNativeVersion.h
+index 0aa4651..11ceff1 100644
+--- a/node_modules/react-native/ReactCommon/cxxreact/ReactNativeVersion.h
++++ b/node_modules/react-native/ReactCommon/cxxreact/ReactNativeVersion.h
+@@ -17,7 +17,7 @@ namespace facebook::react {
+ constexpr struct {
+   int32_t Major = 0;
+   int32_t Minor = 71;
+-  int32_t Patch = 3;
++  int32_t Patch = 4;
+   std::string_view Prerelease = "";
+ } ReactNativeVersion;
+ 
+diff --git a/node_modules/react-native/build.gradle.kts b/node_modules/react-native/build.gradle.kts
+new file mode 100644
+index 0000000..72cfdd0
+--- /dev/null
++++ b/node_modules/react-native/build.gradle.kts
+@@ -0,0 +1,131 @@
++/*
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++plugins { id("io.github.gradle-nexus.publish-plugin") version "1.1.0" }
++
++val reactAndroidProperties = java.util.Properties()
++
++File("$rootDir/ReactAndroid/gradle.properties").inputStream().use {
++  reactAndroidProperties.load(it)
++}
++
++version =
++    if (project.hasProperty("isNightly") &&
++        (project.property("isNightly") as? String).toBoolean()) {
++      "${reactAndroidProperties.getProperty("VERSION_NAME")}-SNAPSHOT"
++    } else {
++      reactAndroidProperties.getProperty("VERSION_NAME")
++    }
++
++group = "com.facebook.react"
++
++val ndkPath by extra(System.getenv("ANDROID_NDK"))
++val ndkVersion by extra(System.getenv("ANDROID_NDK_VERSION"))
++
++buildscript {
++  repositories {
++    google()
++    mavenCentral()
++    gradlePluginPortal()
++  }
++  dependencies {
++    classpath("com.android.tools.build:gradle:7.3.1")
++    classpath("de.undercouch:gradle-download-task:5.0.1")
++    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
++  }
++}
++
++val sonatypeUsername = findProperty("SONATYPE_USERNAME")?.toString()
++val sonatypePassword = findProperty("SONATYPE_PASSWORD")?.toString()
++
++nexusPublishing {
++  repositories {
++    sonatype {
++      username.set(sonatypeUsername)
++      password.set(sonatypePassword)
++    }
++  }
++}
++
++allprojects {
++  repositories {
++    maven { url = uri("$rootDir/node_modules/jsc-android/dist") }
++    maven { url = uri("$rootDir/android") }
++    google()
++    mavenCentral {
++      // We don't want to fetch react-native from Maven Central as there are
++      // older versions over there.
++      content { excludeGroup("com.facebook.react") }
++    }
++  }
++}
++
++tasks.register("cleanAll", Delete::class.java) {
++  description = "Remove all the build files and intermediate build outputs"
++  dependsOn(gradle.includedBuild("react-native-gradle-plugin").task(":clean"))
++  dependsOn(":ReactAndroid:clean")
++  dependsOn(":ReactAndroid:hermes-engine:clean")
++  dependsOn(":packages:rn-tester:android:app:clean")
++  delete(allprojects.map { it.buildDir })
++  delete(rootProject.file("./ReactAndroid/.cxx"))
++  delete(rootProject.file("./ReactAndroid/hermes-engine/.cxx"))
++  delete(rootProject.file("./sdks/download/"))
++  delete(rootProject.file("./sdks/hermes/"))
++  delete(rootProject.file("./ReactAndroid/src/main/jni/prebuilt/lib/arm64-v8a/"))
++  delete(rootProject.file("./ReactAndroid/src/main/jni/prebuilt/lib/armeabi-v7a/"))
++  delete(rootProject.file("./ReactAndroid/src/main/jni/prebuilt/lib/x86/"))
++  delete(rootProject.file("./ReactAndroid/src/main/jni/prebuilt/lib/x86_64/"))
++  delete(rootProject.file("./packages/react-native-codegen/lib"))
++  delete(rootProject.file("./packages/rn-tester/android/app/.cxx"))
++}
++
++tasks.register("buildAll") {
++  description = "Build and test all the React Native relevant projects."
++  dependsOn(gradle.includedBuild("react-native-gradle-plugin").task(":build"))
++  // This builds both the React Native framework for both debug and release
++  dependsOn(":ReactAndroid:assemble")
++  // This creates all the Maven artifacts and makes them available in the /android folder
++  dependsOn(":ReactAndroid:installArchives")
++  // This builds RN Tester for Hermes/JSC for debug only
++  dependsOn(":packages:rn-tester:android:app:assembleDebug")
++  // This compiles the Unit Test sources (without running them as they're partially broken)
++  dependsOn(":ReactAndroid:compileDebugUnitTestSources")
++  dependsOn(":ReactAndroid:compileReleaseUnitTestSources")
++}
++
++tasks.register("downloadAll") {
++  description = "Download all the depedencies needed locally so they can be cached on CI."
++  dependsOn(gradle.includedBuild("react-native-gradle-plugin").task(":dependencies"))
++  dependsOn(":ReactAndroid:downloadNdkBuildDependencies")
++  dependsOn(":ReactAndroid:dependencies")
++  dependsOn(":ReactAndroid:androidDependencies")
++  dependsOn(":ReactAndroid:hermes-engine:dependencies")
++  dependsOn(":ReactAndroid:hermes-engine:androidDependencies")
++}
++
++tasks.register("publishAllInsideNpmPackage") {
++  description =
++      "Publish all the artifacts to be available inside the NPM package in the `android` folder."
++  // Due to size constraints of NPM, we publish only react-native and hermes-engine inside
++  // the NPM package.
++  dependsOn(":ReactAndroid:installArchives")
++  dependsOn(":ReactAndroid:hermes-engine:installArchives")
++}
++
++tasks.register("publishAllToMavenTempLocal") {
++  description = "Publish all the artifacts to be available inside a Maven Local repository on /tmp."
++  dependsOn(":ReactAndroid:publishAllPublicationsToMavenTempLocalRepository")
++  // We don't publish the external-artifacts to Maven Local as CircleCI is using it via workspace.
++  dependsOn(":ReactAndroid:hermes-engine:publishAllPublicationsToMavenTempLocalRepository")
++}
++
++tasks.register("publishAllToSonatype") {
++  description = "Publish all the artifacts to Sonatype (Maven Central or Snapshot repository)"
++  dependsOn(":ReactAndroid:publishToSonatype")
++  dependsOn(":ReactAndroid:external-artifacts:publishToSonatype")
++  dependsOn(":ReactAndroid:hermes-engine:publishToSonatype")
++}
+diff --git a/node_modules/react-native/gradle.properties b/node_modules/react-native/gradle.properties
+new file mode 100644
+index 0000000..da451d7
+--- /dev/null
++++ b/node_modules/react-native/gradle.properties
+@@ -0,0 +1,12 @@
++# This is causing issue with dependencies task: https://github.com/gradle/gradle/issues/9645#issuecomment-530746758
++# org.gradle.configureondemand=true
++org.gradle.daemon=true
++org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
++org.gradle.parallel=true
++
++android.useAndroidX=true
++
++# Use this property to specify which architecture you want to build.
++# You can also override it from the CLI using
++# ./gradlew <task> -PreactNativeArchitectures=x86_64
++reactNativeArchitectures=armeabi-v7a,arm64-v8a,x86,x86_64
+diff --git a/node_modules/react-native/sdks/.hermesversion b/node_modules/react-native/sdks/.hermesversion
+index 42a65fb..b235e48 100644
+--- a/node_modules/react-native/sdks/.hermesversion
++++ b/node_modules/react-native/sdks/.hermesversion
+@@ -1 +1 @@
+-hermes-2022-11-30-RNv0.71.0-1eb8f7ea3059a338205c302cea0f5a3057f93049
+\ No newline at end of file
++hermes-2023-03-07-RNv0.71.4-31fdcf738940875c9bacf251e149006cf515d763
+\ No newline at end of file
+diff --git a/node_modules/react-native/sdks/hermesc/linux64-bin/hermesc b/node_modules/react-native/sdks/hermesc/linux64-bin/hermesc
+index 8d2f8bb..9faffe8 100644
+Binary files a/node_modules/react-native/sdks/hermesc/linux64-bin/hermesc and b/node_modules/react-native/sdks/hermesc/linux64-bin/hermesc differ
+diff --git a/node_modules/react-native/sdks/hermesc/osx-bin/hermesc b/node_modules/react-native/sdks/hermesc/osx-bin/hermesc
+index bd1859b..3a3eb16 100644
+Binary files a/node_modules/react-native/sdks/hermesc/osx-bin/hermesc and b/node_modules/react-native/sdks/hermesc/osx-bin/hermesc differ
+diff --git a/node_modules/react-native/sdks/hermesc/win64-bin/hermesc.exe b/node_modules/react-native/sdks/hermesc/win64-bin/hermesc.exe
+index 97b4c06..7a1558b 100644
+Binary files a/node_modules/react-native/sdks/hermesc/win64-bin/hermesc.exe and b/node_modules/react-native/sdks/hermesc/win64-bin/hermesc.exe differ
+diff --git a/node_modules/react-native/settings.gradle.kts b/node_modules/react-native/settings.gradle.kts
+new file mode 100644
+index 0000000..f4dc00a
+--- /dev/null
++++ b/node_modules/react-native/settings.gradle.kts
+@@ -0,0 +1,34 @@
++/*
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++pluginManagement {
++  repositories {
++    mavenCentral()
++    google()
++    gradlePluginPortal()
++  }
++}
++
++include(":ReactAndroid", ":ReactAndroid:hermes-engine", ":ReactAndroid:external-artifacts")
++
++// If the ./packages folder exists, then we're inside the React Native repository.
++// If not, a users is consuming this project for a build from source.
++if (File("${rootDir}/packages").exists()) {
++  include(":packages:rn-tester:android:app")
++  // Include this to enable codegen Gradle plugin.
++  includeBuild("packages/react-native-gradle-plugin/")
++}
++
++rootProject.name = "react-native-github"
++
++plugins { id("com.gradle.enterprise").version("3.7.1") }
++
++// If you specify a file inside gradle/gradle-enterprise.gradle.kts
++// you can configure your custom Gradle Enterprise instance
++if (File("./gradle/gradle-enterprise.gradle.kts").exists()) {
++  apply(from = "./gradle/gradle-enterprise.gradle.kts")
++}
+diff --git a/node_modules/react-native/template/package.json b/node_modules/react-native/template/package.json
+index a2792c0..fd5cae9 100644
+--- a/node_modules/react-native/template/package.json
++++ b/node_modules/react-native/template/package.json
+@@ -11,7 +11,7 @@
+   },
+   "dependencies": {
+     "react": "18.2.0",
+-    "react-native": "0.71.3"
++    "react-native": "0.71.4"
+   },
+   "devDependencies": {
+     "@babel/core": "^7.20.0",
+@@ -25,7 +25,7 @@
+     "babel-jest": "^29.2.1",
+     "eslint": "^8.19.0",
+     "jest": "^29.2.1",
+-    "metro-react-native-babel-preset": "0.73.7",
++    "metro-react-native-babel-preset": "0.73.8",
+     "prettier": "^2.4.1",
+     "react-test-renderer": "18.2.0",
+     "typescript": "4.8.4"
