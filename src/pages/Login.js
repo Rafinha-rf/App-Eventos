@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Image, StyleSheet, BackHandler, TextInput } from 'react-native';
+import { Image, StyleSheet, BackHandler, TextInput, ActivityIndicator } from 'react-native';
 import { Button } from 'react-native-elements';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const LoginScreen = React.memo(({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const backAction = () => {
@@ -22,7 +23,12 @@ const LoginScreen = React.memo(({ navigation }) => {
 
   const handleLogin = () => {
     if (username && password) {
-      navigation.navigate('Home');
+      setIsLoading(true);
+      // simulando um tempo de espera
+      setTimeout(() => {
+        setIsLoading(false);
+        navigation.navigate('Home');
+      }, 2000);
     }
   };
 
@@ -47,7 +53,7 @@ const LoginScreen = React.memo(({ navigation }) => {
         secureTextEntry={true}
       />
       <Button
-        title="Entrar"
+        title={isLoading ? 'Entrando...' : 'Entrar'}
         onPress={handleLogin}
         containerStyle={styles.buttonContainer}
         buttonStyle={styles.button}
@@ -55,6 +61,7 @@ const LoginScreen = React.memo(({ navigation }) => {
         disabled={isDisabled}
         disabledStyle={styles.disabledButton}
       />
+      {isLoading && <ActivityIndicator size="large" color="#FFFFFF" />}
     </LinearGradient>
   );
 });
