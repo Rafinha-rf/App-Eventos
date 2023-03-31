@@ -7,6 +7,7 @@ import EventListScreen from './src/pages/EventList';
 import SplashScreen from './src/pages/Splash';
 import FavoriteEventsScreen from './src/pages/FavoriteEvents';
 import EventDetailsScreen from './src/pages/EventDetails';
+import LoginScreen from './src/pages/Login';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ const App = () => {
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Splash">
           <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
           <Stack.Screen name="EventList" component={EventListScreen} options={{ headerShown: false }} />
           <Stack.Screen name="FavoriteEvents" component={FavoriteEventsScreen} options={{ headerShown: false }} />
