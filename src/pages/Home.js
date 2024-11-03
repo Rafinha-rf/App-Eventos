@@ -3,6 +3,9 @@ import { Image, StyleSheet, BackHandler, TouchableOpacity } from 'react-native';
 import { Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Asset } from 'expo-asset';
+const icon = Asset.fromModule(require('../../assets/icon.png')).uri;
+
 
 const HomeScreen = React.memo(({ navigation }) => {
   
@@ -25,7 +28,9 @@ const HomeScreen = React.memo(({ navigation }) => {
 
   return (
     <LinearGradient colors={['#B31B1B', '#1E1E1E']} style={styles.container}>
-      <Image style={styles.logo} source={require('../../assets/icon.png')} />
+      <Image 
+        source={{uri:icon}} 
+        style={styles.logo} />
       <Button
         title="Ver Eventos"
         onPress={() => navigation.navigate('EventList')}
@@ -57,6 +62,7 @@ const styles = StyleSheet.create({
     height: 200,
     width: 200,
     marginBottom: 50,
+    resizeMode: 'contain',
   },
   buttonContainer: {
     marginVertical: 10,

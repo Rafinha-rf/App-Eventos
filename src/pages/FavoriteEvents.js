@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#B31B1B',
     padding: 8,
     borderRadius: 8,
-    margin: -5,
+    margin: -13,
   },
   removeButtonText: {
     color: '#fff',

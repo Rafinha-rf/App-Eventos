@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Image, StyleSheet, BackHandler, TextInput, ActivityIndicator } from 'react-native';
+import { Image, StyleSheet, BackHandler, TextInput, ActivityIndicator, Text} from 'react-native';
 import { Button } from 'react-native-elements';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Asset } from 'expo-asset';
+const icon = Asset.fromModule(require('../../assets/icon.png')).uri;
 
 const LoginScreen = React.memo(({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -36,7 +38,8 @@ const LoginScreen = React.memo(({ navigation }) => {
 
   return (
     <LinearGradient colors={['#B31B1B', '#1E1E1E']} style={styles.container}>
-      <Image style={styles.logo} source={require('../../assets/icon.png')} />
+      <Image style={styles.logo} source={{uri: icon}} />
+      <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
         autoCorrect={false}
@@ -77,6 +80,12 @@ const styles = StyleSheet.create({
     width: 200,
     marginBottom: 50,
   },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 20,
+  },
   buttonContainer: {
     marginVertical: 10,
     width: '80%',
@@ -91,12 +100,12 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: '#FFF',
     width: '80%',
-    marginBottom: 15,
+    marginBottom: 20,
     borderRadius: 20,
     borderWidth: 2,
     borderColor: '#000000',
     fontSize: 15,
-    padding: 7,
+    padding: 15,
   },
   disabledButton: {
     backgroundColor: 'grey',

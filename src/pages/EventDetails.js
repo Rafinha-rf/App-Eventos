@@ -5,6 +5,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Dimensions } from 'react-native';
 import PhoneModal from '../components/PhoneModal';
 import SocialModal from '../components/SocialModal';
+import { Asset } from 'expo-asset';
+
+const mapIcon = Asset.fromModule(require('../../assets/map-icon.png')).uri;
+const calendarIcon = Asset.fromModule(require('../../assets/calendar-icon.png')).uri;
+const phoneIcon = Asset.fromModule(require('../../assets/phone-icon.png')).uri;
+const emailIcon = Asset.fromModule(require('../../assets/email-icon.png')).uri;
+const socialIcon = Asset.fromModule(require('../../assets/social-icon.png')).uri;
+const ticketIcon = Asset.fromModule(require('../../assets/ticket-icon.png')).uri;
+const playIcon = Asset.fromModule(require('../../assets/play-icon.png')).uri;
+
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -65,13 +75,13 @@ const EventDetailsScreen = React.memo(() => {
           <Image style={styles.logo} source={{ uri: event.logo }} />
           <View style={styles.eventInfo}>
             <TouchableOpacity style={styles.locationContainer} onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${event.location.latitude},${event.location.longitude}`)}>
-              <Image style={styles.mapIcon} source={require('../../assets/map-icon.png')} />
+              <Image style={styles.mapIcon} source={{uri: mapIcon}} />
               <Text style={styles.locationText}>{event.location.address}</Text>
             </TouchableOpacity>
             <View style={styles.dateContainer}>
               <Text style={styles.date}>{event.date}</Text>
               <TouchableOpacity onPress={() => Linking.openURL(`https://www.google.com/calendar/render?action=TEMPLATE&text=${event.name}&dates=${event.date}&details=${event.location}`)}>
-                <Image style={styles.calendarIcon} source={require('../../assets/calendar-icon.png')} />
+                <Image style={styles.calendarIcon} source={{uri: calendarIcon}} />
               </TouchableOpacity>
             </View>
             <Text style={styles.value}>Valor: {event.valor}</Text>
@@ -79,19 +89,19 @@ const EventDetailsScreen = React.memo(() => {
         </View>
         <View style={styles.contactContainer}>
           <TouchableOpacity style={styles.contactButton} onPress={() => setPhoneModalVisible(true)}>
-            <Image style={styles.phoneIcon} source={require('../../assets/phone-icon.png')} />
+            <Image style={styles.phoneIcon} source={{uri: phoneIcon}} />
             <Text style={styles.contactText}>Telefone</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.contactButton} onPress={handleEmailPress}>
-            <Image style={styles.emailIcon} source={require('../../assets/email-icon.png')} />
+            <Image style={styles.emailIcon} source={{uri: emailIcon}} />
             <Text style={styles.contactText}>E-mail</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.contactButton} onPress={() => setSocialModalVisible(true)}>
-            <Image style={styles.socialIcon} source={require('../../assets/social-icon.png')} />
+            <Image style={styles.socialIcon} source={{uri: socialIcon}} />
             <Text style={styles.contactText}>Redes Sociais</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.contactButton} onPress={handleBuyTicketPress}>
-            <Image style={styles.ticketIcon} source={require('../../assets/ticket-icon.png')} />
+            <Image style={styles.ticketIcon} source={{uri: ticketIcon}} />
             <Text style={styles.contactText}>Comprar ingresso</Text>
           </TouchableOpacity>
         </View>
@@ -105,7 +115,7 @@ const EventDetailsScreen = React.memo(() => {
         {event.video && (
           <View style={styles.videoContainer}>
             <TouchableOpacity style={styles.videoButton} onPress={handleVideoPress}>
-              <Image style={styles.playIcon} source={require('../../assets/play-icon.png')} />
+              <Image style={styles.playIcon} source={{uri: playIcon}} />
             </TouchableOpacity>
           </View>
         )}
